@@ -1,7 +1,7 @@
 from django.db import models
 from django.test import TestCase
-from django_fsm import FSMField, transition, RETURN_VALUE, GET_STATE
-from django_fsm.signals import pre_transition, post_transition
+from xstate_machine import FSMField, transition, RETURN_VALUE, GET_STATE
+from xstate_machine.signals import pre_transition, post_transition
 
 
 class MultiResultTest(models.Model):

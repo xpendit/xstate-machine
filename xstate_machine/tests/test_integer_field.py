@@ -1,6 +1,6 @@
 from django.db import models
 from django.test import TestCase
-from django_fsm import FSMIntegerField, TransitionNotAllowed, transition
+from xstate_machine import FSMIntegerField, TransitionNotAllowed, transition
 
 
 class BlogPostStateEnum(object):

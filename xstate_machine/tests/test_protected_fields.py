@@ -4,7 +4,7 @@ import django
 from django.db import models
 from django.test import TestCase
 
-from django_fsm import FSMField, FSMModelMixin, transition
+from xstate_machine import FSMField, FSMModelMixin, transition
 
 
 class RefreshableProtectedAccessModel(models.Model):

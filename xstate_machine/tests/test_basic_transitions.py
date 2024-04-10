@@ -1,8 +1,8 @@
 from django.db import models
 from django.test import TestCase
 
-from django_fsm import FSMField, TransitionNotAllowed, transition, can_proceed, Transition
-from django_fsm.signals import pre_transition, post_transition
+from xstate_machine import FSMField, TransitionNotAllowed, transition, can_proceed, Transition
+from xstate_machine.signals import pre_transition, post_transition
 
 
 class BlogPost(models.Model):

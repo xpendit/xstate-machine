@@ -12,7 +12,7 @@ except ImportError:  # Django >= 4.0
     from django.core.management.base import ALL_CHECKS
     _requires_system_checks = ALL_CHECKS
 
-from django_fsm import FSMFieldMixin, GET_STATE, RETURN_VALUE
+from xstate_machine import FSMFieldMixin, GET_STATE, RETURN_VALUE
 
 try:
     from django.db.models import get_apps, get_app, get_models, get_model

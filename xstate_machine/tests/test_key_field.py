@@ -1,6 +1,6 @@
 from django.db import models
 from django.test import TestCase
-from django_fsm import FSMKeyField, TransitionNotAllowed, transition, can_proceed
+from xstate_machine import FSMKeyField, TransitionNotAllowed, transition, can_proceed
 
 
 FK_AVAILABLE_STATES = (
