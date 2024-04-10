@@ -22,11 +22,13 @@ class DBState(models.Model):
         return self.label
 
     class Meta:
-        app_label = "django_fsm"
+        app_label = "xstate_machine"
 
 
 class FKBlogPost(models.Model):
-    state = FSMKeyField(DBState, default="new", protected=True, on_delete=models.CASCADE)
+    state = FSMKeyField(
+        DBState, default="new", protected=True, on_delete=models.CASCADE
+    )
 
     @transition(field=state, source="new", target="published")
     def publish(self):
@@ -53,7 +55,7 @@ class FKBlogPost(models.Model):
         pass
 
     class Meta:
-        app_label = "django_fsm"
+        app_label = "xstate_machine"
 
 
 class FSMKeyFieldTest(TestCase):
@@ -120,7 +122,7 @@ class BlogPostStatus(models.Model):
     objects = models.Manager()
 
     class Meta:
-        app_label = 'django_fsm'
+        app_label = 'xstate_machine'
 
 
 class BlogPostWithFKState(models.Model):
