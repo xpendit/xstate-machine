@@ -33,4 +33,4 @@ jobs:
         run: poetry install --no-interaction --no-root
 
       - name: 🧪 Run tests
-        run: poetry run python manage.py test
+        run: poetry run python tests/manage.py test
