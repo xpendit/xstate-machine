@@ -11,7 +11,7 @@ from django.db import models
 from django.db.models import Field
 from django.db.models.query_utils import DeferredAttribute
 from django.db.models.signals import class_prepared
-from django_fsm.signals import pre_transition, post_transition
+from xstate_machine.signals import pre_transition, post_transition
 
 try:
     from functools import partialmethod

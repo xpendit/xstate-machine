@@ -5,7 +5,7 @@ from django.test.utils import override_settings
 
 from guardian.shortcuts import assign_perm
 
-from django_fsm import FSMField, transition, has_transition_perm
+from xstate_machine import FSMField, transition, has_transition_perm
 
 
 class ObjectPermissionTestModel(models.Model):

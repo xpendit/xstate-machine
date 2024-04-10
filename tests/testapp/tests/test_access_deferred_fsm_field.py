@@ -1,6 +1,6 @@
 from django.db import models
 from django.test import TestCase
-from django_fsm import FSMField, transition, can_proceed
+from xstate_machine import FSMField, transition, can_proceed
 
 
 class DeferrableModel(models.Model):

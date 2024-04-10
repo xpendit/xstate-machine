@@ -1,7 +1,7 @@
 from django.db import models
 from django.test import TestCase
 
-from django_fsm import FSMField, transition
+from xstate_machine import FSMField, transition
 
 
 class ProtectedAccessModel(models.Model):

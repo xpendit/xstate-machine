@@ -1,40 +1,29 @@
 from django.db import models
 from django.test import TestCase
 
-from django_fsm import FSMField, transition, can_proceed
+from xstate_machine import FSMField, transition, can_proceed
 
 
-class BaseAbstractModel(models.Model):
+class BaseModel(models.Model):
     state = FSMField(default="new")
-
-    class Meta:
-        abstract = True
 
     @transition(field=state, source="new", target="published")
     def publish(self):
         pass
 
 
-class AnotherFromAbstractModel(BaseAbstractModel):
-    """
-    This class exists to trigger a regression when multiple concrete classes
-    inherit from a shared abstract class (example: BaseAbstractModel).
-    Don't try to remove it.
-    """
+class InheritedModel(BaseModel):
     @transition(field="state", source="published", target="sticked")
     def stick(self):
         pass
 
-
-class InheritedFromAbstractModel(BaseAbstractModel):
-    @transition(field="state", source="published", target="sticked")
-    def stick(self):
-        pass
+    class Meta:
+        proxy = True
 
 
 class TestinheritedModel(TestCase):
     def setUp(self):
-        self.model = InheritedFromAbstractModel()
+        self.model = InheritedModel()
 
     def test_known_transition_should_succeed(self):
         self.assertTrue(can_proceed(self.model.publish))
@@ -50,6 +39,10 @@ class TestinheritedModel(TestCase):
         self.assertEqual(self.model.state, "published")
         transitions = self.model.get_available_state_transitions()
         self.assertEqual(["sticked"], [data.target for data in transitions])
+
+    def test_field_all_transitions_base_model(self):
+        transitions = BaseModel().get_all_state_transitions()
+        self.assertEqual(set([("new", "published")]), set((data.source, data.target) for data in transitions))
 
     def test_field_all_transitions_works(self):
         transitions = self.model.get_all_state_transitions()
