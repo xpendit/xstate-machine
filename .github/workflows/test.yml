@@ -32,5 +32,8 @@ jobs:
         if: ${{ steps.setup-python.outputs.cache-hit }} == 'true'
         run: poetry install --no-interaction --no-root
 
+      - name: 🎁 Test that it builds
+        run: poetry build
+
       - name: 🧪 Run tests
         run: poetry run python tests/manage.py test
