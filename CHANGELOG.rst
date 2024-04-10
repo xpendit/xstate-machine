@@ -1,5 +1,14 @@
 Changelog
 =========
+xstate-machine 3.1.1 2024-04-10
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+- Clean up project
+
+- Reboot project as xstate-machine
+xstate-machine 3.1.0 2024-04-10
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+- Reboot project as xstate-machine
 
 django-fsm 2.8.2 2024-04-09
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
