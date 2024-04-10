@@ -15,7 +15,7 @@ class RefreshableProtectedAccessModel(models.Model):
         pass
 
     class Meta:
-        app_label = 'django_fsm'
+        app_label = 'xstate_machine'
 
 
 class RefreshableModel(FSMModelMixin, RefreshableProtectedAccessModel):

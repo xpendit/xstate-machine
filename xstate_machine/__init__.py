@@ -46,23 +46,6 @@ __all__ = [
 ]
 
 
-import warnings
-
-
-def show_deprecation_warning():
-    message = (
-        "The 'django-fsm' package has been integrated into 'viewflow' as 'viewflow.fsm' starting from version 3.0. "
-        "This version of 'django-fsm' is no longer maintained and will not receive further updates. "
-        "If you require new functionality introduced in 'django-fsm' version 3.0 or later, "
-        "please migrate to 'viewflow.fsm'. For detailed instructions on the migration process and accessing new features, "
-        "refer to the official documentation at https://docs.viewflow.io/fsm/index.html"
-    )
-    warnings.warn(message, UserWarning, stacklevel=2)
-
-
-show_deprecation_warning()
-
-
 if sys.version_info[:2] == (2, 6):
     # Backport of Python 2.7 inspect.getmembers,
     # since Python 2.6 ships buggy implementation
@@ -88,9 +71,9 @@ try:
 except ImportError:
     pass
 else:
-    add_introspection_rules([], [r"^django_fsm\.FSMField"])
-    add_introspection_rules([], [r"^django_fsm\.FSMIntegerField"])
-    add_introspection_rules([], [r"^django_fsm\.FSMKeyField"])
+    add_introspection_rules([], [r"^xstate_machine\.FSMField"])
+    add_introspection_rules([], [r"^xstate_machine\.FSMIntegerField"])
+    add_introspection_rules([], [r"^xstate_machine\.FSMKeyField"])
 
 
 class TransitionNotAllowed(Exception):
@@ -163,7 +146,7 @@ def get_available_FIELD_transitions(instance, field):
     transitions = field.transitions[instance.__class__]
 
     for name, transition in transitions.items():
-        meta = transition._django_fsm
+        meta = transition._xstate_machine
         if meta.has_transition(curr_state) and meta.conditions_met(
             instance, curr_state
         ):
@@ -337,7 +320,7 @@ class FSMFieldMixin(object):
         # signature changed over time, so we need to check Django version
         # before proceeding to call DeferredAttribute. An alternative to this
         # would be copying the latest implementation of DeferredAttribute to
-        # django_fsm, but this comes with the added responsibility of keeping
+        # xstate_machine, but this comes with the added responsibility of keeping
         # the copied code up to date.
         if django.VERSION[:3] >= (3, 0, 0):
             return DeferredAttribute(self).__get__(instance)
@@ -376,7 +359,7 @@ class FSMFieldMixin(object):
             instance.__class__ = model
 
     def change_state(self, instance, method, *args, **kwargs):
-        meta = method._django_fsm
+        meta = method._xstate_machine
         method_name = method.__name__
         current_state = self.get_state(instance)
 
@@ -443,7 +426,7 @@ class FSMFieldMixin(object):
         transitions = self.transitions[instance_cls]
 
         for name, transition in transitions.items():
-            meta = transition._django_fsm
+            meta = transition._xstate_machine
 
             for transition in meta.transitions.values():
                 yield transition
@@ -480,13 +463,13 @@ class FSMFieldMixin(object):
         def is_field_transition_method(attr):
             return (
                 (inspect.ismethod(attr) or inspect.isfunction(attr))
-                and hasattr(attr, "_django_fsm")
+                and hasattr(attr, "_xstate_machine")
                 and (
-                    attr._django_fsm.field in [self, self.name]
+                    attr._xstate_machine.field in [self, self.name]
                     or (
-                        isinstance(attr._django_fsm.field, Field)
-                        and attr._django_fsm.field.name == self.name
-                        and attr._django_fsm.field.creation_counter
+                        isinstance(attr._xstate_machine.field, Field)
+                        and attr._xstate_machine.field.name == self.name
+                        and attr._xstate_machine.field.creation_counter
                         == self.creation_counter
                     )
                 )
@@ -495,7 +478,7 @@ class FSMFieldMixin(object):
         sender_transitions = {}
         transitions = inspect.getmembers(sender, predicate=is_field_transition_method)
         for method_name, method in transitions:
-            method._django_fsm.field = self
+            method._xstate_machine.field = self
             sender_transitions[method_name] = method
 
         self.transitions[sender] = sender_transitions
@@ -664,19 +647,19 @@ def transition(
     """
 
     def inner_transition(func):
-        wrapper_installed, fsm_meta = True, getattr(func, "_django_fsm", None)
+        wrapper_installed, fsm_meta = True, getattr(func, "_xstate_machine", None)
         if not fsm_meta:
             wrapper_installed = False
             fsm_meta = FSMMeta(field=field, method=func)
-            setattr(func, "_django_fsm", fsm_meta)
+            setattr(func, "_xstate_machine", fsm_meta)
 
         if isinstance(source, (list, tuple, set)):
             for state in source:
-                func._django_fsm.add_transition(
+                func._xstate_machine.add_transition(
                     func, state, target, on_error, conditions, permission, custom
                 )
         else:
-            func._django_fsm.add_transition(
+            func._xstate_machine.add_transition(
                 func, source, target, on_error, conditions, permission, custom
             )
 
@@ -699,11 +682,11 @@ def can_proceed(bound_method, check_conditions=True):
     Set ``check_conditions`` argument to ``False`` to skip checking
     conditions.
     """
-    if not hasattr(bound_method, "_django_fsm"):
+    if not hasattr(bound_method, "_xstate_machine"):
         im_func = getattr(bound_method, "im_func", getattr(bound_method, "__func__"))
         raise TypeError("%s method is not transition" % im_func.__name__)
 
-    meta = bound_method._django_fsm
+    meta = bound_method._xstate_machine
     im_self = getattr(bound_method, "im_self", getattr(bound_method, "__self__"))
     current_state = meta.field.get_state(im_self)
 
@@ -716,11 +699,11 @@ def has_transition_perm(bound_method, user):
     """
     Returns True if model in state allows to call bound_method and user have rights on it
     """
-    if not hasattr(bound_method, "_django_fsm"):
+    if not hasattr(bound_method, "_xstate_machine"):
         im_func = getattr(bound_method, "im_func", getattr(bound_method, "__func__"))
         raise TypeError("%s method is not transition" % im_func.__name__)
 
-    meta = bound_method._django_fsm
+    meta = bound_method._xstate_machine
     im_self = getattr(bound_method, "im_self", getattr(bound_method, "__self__"))
     current_state = meta.field.get_state(im_self)
 

@@ -12,7 +12,7 @@ class ProtectedAccessModel(models.Model):
         pass
 
     class Meta:
-        app_label = "django_fsm"
+        app_label = "xstate_machine"
 
 
 class MultiProtectedAccessModel(models.Model):
@@ -20,7 +20,7 @@ class MultiProtectedAccessModel(models.Model):
     status2 = FSMField(default="new", protected=True)
 
     class Meta:
-        app_label = "django_fsm"
+        app_label = "xstate_machine"
 
 
 class TestDirectAccessModels(TestCase):

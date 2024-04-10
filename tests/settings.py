@@ -1,7 +1,7 @@
 import django
 
 PROJECT_APPS = (
-    "django_fsm",
+    "xstate_machine",
     "testapp",
 )
 

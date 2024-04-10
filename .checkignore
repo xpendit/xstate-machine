@@ -1,2 +1,2 @@
 tests/*
-django_fsm/tests/*
+xstate_machine/tests/*

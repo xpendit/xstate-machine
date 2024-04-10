@@ -11,7 +11,7 @@ jobs:
   test:
     strategy:
       matrix:
-        python-version: [3.10, 3.11]
+        python-version: ['3.10', '3.11']
     runs-on: ubuntu-22.04
     name: 🧪 Run tests
     steps:
@@ -33,4 +33,4 @@ jobs:
         run: poetry install --no-interaction --no-root
 
       - name: 🧪 Run tests
-        run: poetry run tox
+        run: poetry run python manage.py test

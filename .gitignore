@@ -1,5 +1,5 @@
 *.pyc
 dist/
 build/
-django_fsm.egg-info/
+xstate_machine.egg-info/
 .tox/
