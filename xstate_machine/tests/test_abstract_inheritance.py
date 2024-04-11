@@ -21,6 +21,7 @@ class AnotherFromAbstractModel(BaseAbstractModel):
     inherit from a shared abstract class (example: BaseAbstractModel).
     Don't try to remove it.
     """
+
     @transition(field="state", source="published", target="sticked")
     def stick(self):
         pass
@@ -54,5 +55,6 @@ class TestinheritedModel(TestCase):
     def test_field_all_transitions_works(self):
         transitions = self.model.get_all_state_transitions()
         self.assertEqual(
-            set([("new", "published"), ("published", "sticked")]), set((data.source, data.target) for data in transitions)
+            set([("new", "published"), ("published", "sticked")]),
+            set((data.source, data.target) for data in transitions),
         )

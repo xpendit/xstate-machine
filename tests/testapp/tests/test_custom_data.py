@@ -6,15 +6,31 @@ from xstate_machine import FSMField, transition
 class BlogPostWithCustomData(models.Model):
     state = FSMField(default="new")
 
-    @transition(field=state, source="new", target="published", conditions=[], custom={"label": "Publish", "type": "*"})
+    @transition(
+        field=state,
+        source="new",
+        target="published",
+        conditions=[],
+        custom={"label": "Publish", "type": "*"},
+    )
     def publish(self):
         pass
 
-    @transition(field=state, source="published", target="destroyed", custom=dict(label="Destroy", type="manual"))
+    @transition(
+        field=state,
+        source="published",
+        target="destroyed",
+        custom=dict(label="Destroy", type="manual"),
+    )
     def destroy(self):
         pass
 
-    @transition(field=state, source="published", target="review", custom=dict(label="Periodic review", type="automated"))
+    @transition(
+        field=state,
+        source="published",
+        target="review",
+        custom=dict(label="Periodic review", type="automated"),
+    )
     def review(self):
         pass
 

@@ -1,0 +1,36 @@
+name: 🧹 Lint code
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+jobs:
+  test:
+    runs-on: ubuntu-22.04
+    name: 🧹 Run linters
+    steps:
+      - name: 🛎️ Checkout code
+        uses: actions/checkout@v4
+
+      - name: 🐍 Install poetry
+        run: pipx install poetry
+
+      - name: ⚙️ Setup python
+        id: setup-python
+        uses: actions/setup-python@v5
+        with:
+          python-version-file: .python-version
+          cache: 'poetry'
+
+      - name: 📝 Install dependencies
+        if: ${{ steps.setup-python.outputs.cache-hit }} == 'true'
+        run: poetry install --no-interaction --no-root
+
+      - name: 🧹 Lint code
+        run: poetry run ruff check .
+
+      - name: 💅 Check code formatting
+        run: poetry run format --check .

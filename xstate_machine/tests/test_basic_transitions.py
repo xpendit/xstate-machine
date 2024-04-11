@@ -1,7 +1,13 @@
 from django.db import models
 from django.test import TestCase
 
-from xstate_machine import FSMField, TransitionNotAllowed, transition, can_proceed, Transition
+from xstate_machine import (
+    FSMField,
+    TransitionNotAllowed,
+    transition,
+    can_proceed,
+    Transition,
+)
 from xstate_machine.signals import pre_transition, post_transition
 
 
@@ -168,14 +174,26 @@ class TestFieldTransitionsInspect(TestCase):
 
     def test_available_conditions_from_new(self):
         transitions = self.model.get_available_state_transitions()
-        actual = set((transition.source, transition.target) for transition in transitions)
-        expected = set([("*", "moderated"), ("new", "published"), ("new", "removed"), ("*", ""), ("+", "blocked")])
+        actual = set(
+            (transition.source, transition.target) for transition in transitions
+        )
+        expected = set(
+            [
+                ("*", "moderated"),
+                ("new", "published"),
+                ("new", "removed"),
+                ("*", ""),
+                ("+", "blocked"),
+            ]
+        )
         self.assertEqual(actual, expected)
 
     def test_available_conditions_from_published(self):
         self.model.publish()
         transitions = self.model.get_available_state_transitions()
-        actual = set((transition.source, transition.target) for transition in transitions)
+        actual = set(
+            (transition.source, transition.target) for transition in transitions
+        )
         expected = set(
             [
                 ("*", "moderated"),
@@ -192,36 +210,48 @@ class TestFieldTransitionsInspect(TestCase):
         self.model.publish()
         self.model.hide()
         transitions = self.model.get_available_state_transitions()
-        actual = set((transition.source, transition.target) for transition in transitions)
-        expected = set([("*", "moderated"), ("hidden", "stolen"), ("*", ""), ("+", "blocked")])
+        actual = set(
+            (transition.source, transition.target) for transition in transitions
+        )
+        expected = set(
+            [("*", "moderated"), ("hidden", "stolen"), ("*", ""), ("+", "blocked")]
+        )
         self.assertEqual(actual, expected)
 
     def test_available_conditions_from_stolen(self):
         self.model.publish()
         self.model.steal()
         transitions = self.model.get_available_state_transitions()
-        actual = set((transition.source, transition.target) for transition in transitions)
+        actual = set(
+            (transition.source, transition.target) for transition in transitions
+        )
         expected = set([("*", "moderated"), ("*", ""), ("+", "blocked")])
         self.assertEqual(actual, expected)
 
     def test_available_conditions_from_blocked(self):
         self.model.block()
         transitions = self.model.get_available_state_transitions()
-        actual = set((transition.source, transition.target) for transition in transitions)
+        actual = set(
+            (transition.source, transition.target) for transition in transitions
+        )
         expected = set([("*", "moderated"), ("*", "")])
         self.assertEqual(actual, expected)
 
     def test_available_conditions_from_empty(self):
         self.model.empty()
         transitions = self.model.get_available_state_transitions()
-        actual = set((transition.source, transition.target) for transition in transitions)
+        actual = set(
+            (transition.source, transition.target) for transition in transitions
+        )
         expected = set([("*", "moderated"), ("*", ""), ("+", "blocked")])
         self.assertEqual(actual, expected)
 
     def test_all_conditions(self):
         transitions = self.model.get_all_state_transitions()
 
-        actual = set((transition.source, transition.target) for transition in transitions)
+        actual = set(
+            (transition.source, transition.target) for transition in transitions
+        )
         expected = set(
             [
                 ("*", "moderated"),

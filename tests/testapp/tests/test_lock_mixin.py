@@ -3,7 +3,12 @@ import unittest
 import django
 from django.db import models
 from django.test import TestCase
-from xstate_machine import FSMField, ConcurrentTransitionMixin, ConcurrentTransition, transition
+from xstate_machine import (
+    FSMField,
+    ConcurrentTransitionMixin,
+    ConcurrentTransition,
+    transition,
+)
 
 
 class LockedBlogPost(ConcurrentTransitionMixin, models.Model):
