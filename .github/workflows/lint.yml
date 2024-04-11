@@ -33,4 +33,4 @@ jobs:
         run: poetry run ruff check .
 
       - name: 💅 Check code formatting
-        run: poetry run format --check .
+        run: poetry run ruff format --check .
