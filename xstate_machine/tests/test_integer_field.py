@@ -12,11 +12,15 @@ class BlogPostStateEnum(object):
 class BlogPostWithIntegerField(models.Model):
     state = FSMIntegerField(default=BlogPostStateEnum.NEW)
 
-    @transition(field=state, source=BlogPostStateEnum.NEW, target=BlogPostStateEnum.PUBLISHED)
+    @transition(
+        field=state, source=BlogPostStateEnum.NEW, target=BlogPostStateEnum.PUBLISHED
+    )
     def publish(self):
         pass
 
-    @transition(field=state, source=BlogPostStateEnum.PUBLISHED, target=BlogPostStateEnum.HIDDEN)
+    @transition(
+        field=state, source=BlogPostStateEnum.PUBLISHED, target=BlogPostStateEnum.HIDDEN
+    )
     def hide(self):
         pass
 

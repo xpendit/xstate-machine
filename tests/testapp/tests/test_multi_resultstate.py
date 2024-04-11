@@ -7,14 +7,19 @@ from xstate_machine.signals import pre_transition, post_transition
 class MultiResultTest(models.Model):
     state = FSMField(default="new")
 
-    @transition(field=state, source="new", target=RETURN_VALUE("for_moderators", "published"))
+    @transition(
+        field=state, source="new", target=RETURN_VALUE("for_moderators", "published")
+    )
     def publish(self, is_public=False):
         return "published" if is_public else "for_moderators"
 
     @transition(
         field=state,
         source="for_moderators",
-        target=GET_STATE(lambda self, allowed: "published" if allowed else "rejected", states=["published", "rejected"]),
+        target=GET_STATE(
+            lambda self, allowed: "published" if allowed else "rejected",
+            states=["published", "rejected"],
+        ),
     )
     def moderate(self, allowed):
         pass

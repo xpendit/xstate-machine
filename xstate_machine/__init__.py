@@ -2,6 +2,7 @@
 """
 State tracking functionality for django models
 """
+
 import inspect
 import sys
 from functools import wraps

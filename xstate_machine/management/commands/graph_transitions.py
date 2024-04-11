@@ -4,12 +4,15 @@ from optparse import make_option
 from itertools import chain
 
 from django.core.management.base import BaseCommand
+
 try:
     from django.utils.encoding import force_text
+
     _requires_system_checks = True
 except ImportError:  # Django >= 4.0
     from django.utils.encoding import force_str as force_text
     from django.core.management.base import ALL_CHECKS
+
     _requires_system_checks = ALL_CHECKS
 
 from xstate_machine import FSMFieldMixin, GET_STATE, RETURN_VALUE
@@ -30,18 +33,33 @@ HAS_ARGPARSE = VERSION >= (1, 10)
 
 def all_fsm_fields_data(model):
     if NEW_META_API:
-        return [(field, model) for field in model._meta.get_fields() if isinstance(field, FSMFieldMixin)]
+        return [
+            (field, model)
+            for field in model._meta.get_fields()
+            if isinstance(field, FSMFieldMixin)
+        ]
     else:
-        return [(field, model) for field in model._meta.fields if isinstance(field, FSMFieldMixin)]
+        return [
+            (field, model)
+            for field in model._meta.fields
+            if isinstance(field, FSMFieldMixin)
+        ]
 
 
 def node_name(field, state):
     opts = field.model._meta
-    return "%s.%s.%s.%s" % (opts.app_label, opts.verbose_name.replace(" ", "_"), field.name, state)
+    return "%s.%s.%s.%s" % (
+        opts.app_label,
+        opts.verbose_name.replace(" ", "_"),
+        field.name,
+        state,
+    )
 
 
 def node_label(field, state):
-    if type(state) == int or (type(state) == bool and hasattr(field, "choices")):
+    if isinstance(state, int) or (
+        isinstance(state, bool) and hasattr(field, "choices")
+    ):
         return force_text(dict(field.choices).get(state))
     else:
         return state
@@ -51,7 +69,13 @@ def generate_dot(fields_data):
     result = graphviz.Digraph()
 
     for field, model in fields_data:
-        sources, targets, edges, any_targets, any_except_targets = set(), set(), set(), set(), set()
+        sources, targets, edges, any_targets, any_except_targets = (
+            set(),
+            set(),
+            set(),
+            set(),
+            set(),
+        )
 
         # dump nodes and edges
         for transition in field.get_all_transitions(model):
@@ -66,20 +90,37 @@ def generate_dot(fields_data):
                     else (transition.target,)
                 )
                 source_name_pair = (
-                    ((state, node_name(field, state)) for state in transition.source.allowed_states)
+                    (
+                        (state, node_name(field, state))
+                        for state in transition.source.allowed_states
+                    )
                     if isinstance(transition.source, (GET_STATE, RETURN_VALUE))
                     else ((transition.source, node_name(field, transition.source)),)
                 )
                 for source, source_name in source_name_pair:
                     if transition.on_error:
                         on_error_name = node_name(field, transition.on_error)
-                        targets.add((on_error_name, node_label(field, transition.on_error)))
+                        targets.add(
+                            (on_error_name, node_label(field, transition.on_error))
+                        )
                         edges.add((source_name, on_error_name, (("style", "dotted"),)))
                     for target in _targets:
-                        add_transition(source, target, transition.name, source_name, field, sources, targets, edges)
+                        add_transition(
+                            source,
+                            target,
+                            transition.name,
+                            source_name,
+                            field,
+                            sources,
+                            targets,
+                            edges,
+                        )
 
         targets.update(
-            set((node_name(field, target), node_label(field, target)) for target, _ in chain(any_targets, any_except_targets))
+            set(
+                (node_name(field, target), node_label(field, target))
+                for target, _ in chain(any_targets, any_except_targets)
+            )
         )
         for target, name in any_targets:
             target_name = node_name(field, target)
@@ -100,7 +141,9 @@ def generate_dot(fields_data):
         opts = field.model._meta
         subgraph = graphviz.Digraph(
             name="cluster_%s_%s_%s" % (opts.app_label, opts.object_name, field.name),
-            graph_attr={"label": "%s.%s.%s" % (opts.app_label, opts.object_name, field.name)},
+            graph_attr={
+                "label": "%s.%s.%s" % (opts.app_label, opts.object_name, field.name)
+            },
         )
 
         final_states = targets - sources
@@ -121,7 +164,16 @@ def generate_dot(fields_data):
     return result
 
 
-def add_transition(transition_source, transition_target, transition_name, source_name, field, sources, targets, edges):
+def add_transition(
+    transition_source,
+    transition_target,
+    transition_name,
+    source_name,
+    field,
+    sources,
+    targets,
+    edges,
+):
     target_name = node_name(field, transition_target)
     sources.add((source_name, node_label(field, transition_source)))
     targets.add((target_name, node_label(field, transition_target)))
@@ -148,7 +200,8 @@ class Command(BaseCommand):
                 action="store",
                 dest="outputfile",
                 help=(
-                    "Render output file. Type of output dependent on file extensions. " "Use png or jpg to render graph to image."
+                    "Render output file. Type of output dependent on file extensions. "
+                    "Use png or jpg to render graph to image."
                 ),
             ),
             # NOQA
@@ -158,7 +211,10 @@ class Command(BaseCommand):
                 action="store",
                 dest="layout",
                 default="dot",
-                help=("Layout to be used by GraphViz for visualization. " "Layouts: %s." % " ".join(get_graphviz_layouts())),
+                help=(
+                    "Layout to be used by GraphViz for visualization. "
+                    "Layouts: %s." % " ".join(get_graphviz_layouts())
+                ),
             ),
         )
         args = "[appname[.model[.field]]]"
@@ -171,7 +227,8 @@ class Command(BaseCommand):
                 action="store",
                 dest="outputfile",
                 help=(
-                    "Render output file. Type of output dependent on file extensions. " "Use png or jpg to render graph to image."
+                    "Render output file. Type of output dependent on file extensions. "
+                    "Use png or jpg to render graph to image."
                 ),
             )
             parser.add_argument(
@@ -180,7 +237,10 @@ class Command(BaseCommand):
                 action="store",
                 dest="layout",
                 default="dot",
-                help=("Layout to be used by GraphViz for visualization. " "Layouts: %s." % " ".join(get_graphviz_layouts())),
+                help=(
+                    "Layout to be used by GraphViz for visualization. "
+                    "Layouts: %s." % " ".join(get_graphviz_layouts())
+                ),
             )
             parser.add_argument("args", nargs="*", help=("[appname[.model[.field]]]"))
 
